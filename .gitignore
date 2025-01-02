@@ -1,0 +1,38 @@
+# byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# distribution / packaging
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# virtualenvs
+.venv/
+venv/
+env/
+
+# tooling caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+
+# editors
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# parley runtime outputs
+runs/
+.cache/parley/
+*.parley-cache/
+reports/local/

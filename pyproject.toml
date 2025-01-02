@@ -1,0 +1,112 @@
+[build-system]
+requires = ["hatchling>=1.24"]
+build-backend = "hatchling.build"
+
+[project]
+name = "parley-bench"
+version = "0.1.0"
+description = "Benchmark toolkit for spoken-instruction Vision-Language-Action (VLA) pipelines."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+authors = [{ name = "Ka Yiu Cheung" }]
+keywords = ["benchmark", "speech", "asr", "vla", "robotics", "evaluation"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "numpy>=1.26",
+    "pydantic>=2.6",
+    "pyyaml>=6",
+    "typer>=0.12",
+    "rich>=13",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8",
+    "pytest-cov>=5",
+    "hypothesis>=6.100",
+    "ruff>=0.5",
+    "mypy>=1.10",
+    "types-PyYAML",
+]
+whisper = ["openai-whisper>=20240930"]
+audio = ["soundfile>=0.12", "librosa>=0.10"]
+
+[project.scripts]
+parley = "parley.cli:app"
+
+[project.urls]
+Homepage = "https://github.com/mrvellang/parley"
+Repository = "https://github.com/mrvellang/parley"
+Issues = "https://github.com/mrvellang/parley/issues"
+
+[tool.hatch.build.targets.wheel]
+packages = ["parley"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "C4", "PIE", "RUF"]
+ignore = [
+    "E501",   # line length handled by formatter
+    "B008",   # function-call-in-default-arg — typer uses this
+    "UP007",  # X | Y unions — keep Optional[] for 3.10 clarity
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B011", "SIM117"]
+"examples/*" = ["E402"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["parley"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+show_error_codes = true
+files = ["parley", "tests"]
+
+[[tool.mypy.overrides]]
+module = ["tests.*", "examples.*"]
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+addopts = "-ra --strict-markers --strict-config"
+testpaths = ["tests"]
+filterwarnings = ["error"]
+markers = [
+    "slow: deselect with -m 'not slow'",
+    "integration: end-to-end integration tests",
+]
+
+[tool.coverage.run]
+branch = true
+source = ["parley"]
+omit = ["parley/cli.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = false
+exclude_lines = [
+    "pragma: no cover",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+    "\\.\\.\\.$",
+]
