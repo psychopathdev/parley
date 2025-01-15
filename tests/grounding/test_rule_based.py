@@ -2,11 +2,11 @@
 
 from __future__ import annotations
 
-from parley.core.types import Transcript
+from parley.core.types import Grounding, Transcript
 from parley.grounding import RuleBasedGrounder
 
 
-def _ground(text: str):
+def _ground(text: str) -> Grounding:
     return RuleBasedGrounder().ground(Transcript(text=text, tokens=tuple(text.split())))
 
 
