@@ -125,10 +125,20 @@ class KeywordRecall(Metric):
     name = "keyword_recall"
 
     DEFAULT_KEYWORDS: tuple[str, ...] = (
-        "pick", "place", "push",
-        "red", "blue", "green", "yellow",
-        "cube", "sphere", "block", "ball",
-        "left", "right", "center",
+        "pick",
+        "place",
+        "push",
+        "red",
+        "blue",
+        "green",
+        "yellow",
+        "cube",
+        "sphere",
+        "block",
+        "ball",
+        "left",
+        "right",
+        "center",
     )
 
     def __init__(self, keywords: Iterable[str] | None = None) -> None:

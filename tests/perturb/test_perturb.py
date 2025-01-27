@@ -82,7 +82,9 @@ def test_reverb_smears_energy() -> None:
     """Energy from a short tone should leak past the original duration."""
     sr = 16_000
     audio = Audio(
-        samples=np.concatenate([_tone(sr, 1000.0, 0.1).samples, np.zeros(sr // 5, dtype=np.float32)]),
+        samples=np.concatenate(
+            [_tone(sr, 1000.0, 0.1).samples, np.zeros(sr // 5, dtype=np.float32)]
+        ),
         sample_rate=sr,
     )
     out = Reverb(decay_ms=100.0, wet=0.8).apply_audio(audio, np.random.default_rng(0))
@@ -129,9 +131,7 @@ def test_filler_invalid_rate() -> None:
 
 
 def test_filler_inserts_known_token() -> None:
-    out = FillerInsertion(rate=1.0, fillers=("uhm",)).apply_text(
-        "pick", np.random.default_rng(0)
-    )
+    out = FillerInsertion(rate=1.0, fillers=("uhm",)).apply_text("pick", np.random.default_rng(0))
     assert out.startswith("uhm")
 
 

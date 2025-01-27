@@ -111,7 +111,9 @@ class MuLawCodec(AudioPerturbation):
         quantized = np.round((compressed + 1.0) * 127.5) / 127.5 - 1.0
         # Expand
         expanded = (
-            np.sign(quantized) * (1.0 / self.mu) * (np.power(1.0 + self.mu, np.abs(quantized)) - 1.0)
+            np.sign(quantized)
+            * (1.0 / self.mu)
+            * (np.power(1.0 + self.mu, np.abs(quantized)) - 1.0)
         )
         return _wrap(expanded, audio)
 
@@ -146,7 +148,9 @@ class Reverb(AudioPerturbation):
             return audio
         ir = np.exp(-3.0 * np.arange(n) / n)
         ir = ir / ir.sum()
-        wet = np.convolve(audio.samples.astype(np.float64), ir, mode="full")[: audio.samples.shape[0]]
+        wet = np.convolve(audio.samples.astype(np.float64), ir, mode="full")[
+            : audio.samples.shape[0]
+        ]
         out = (1.0 - self.wet) * audio.samples.astype(np.float64) + self.wet * wet
         return _wrap(out, audio)
 

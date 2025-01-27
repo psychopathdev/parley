@@ -97,7 +97,9 @@ def paired_bootstrap_pvalue(
     arr_a = np.asarray(a, dtype=np.float64)
     arr_b = np.asarray(b, dtype=np.float64)
     if arr_a.shape != arr_b.shape:
-        raise ValueError(f"paired bootstrap requires equal shapes, got {arr_a.shape} vs {arr_b.shape}")
+        raise ValueError(
+            f"paired bootstrap requires equal shapes, got {arr_a.shape} vs {arr_b.shape}"
+        )
     if arr_a.shape[0] == 0:
         return 1.0
     diffs = arr_a - arr_b

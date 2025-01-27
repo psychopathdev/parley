@@ -81,11 +81,11 @@ def generate_dataset(cfg: SynthConfig) -> list[Episode]:
             destination: str | None = None
         else:
             include_dir = cfg.include_directions and rng.random() < 0.9
-            destination = (
-                DIRECTIONS[int(rng.integers(0, len(DIRECTIONS)))] if include_dir else None
-            )
+            destination = DIRECTIONS[int(rng.integers(0, len(DIRECTIONS)))] if include_dir else None
             if destination:
-                text = f"{verb} the {target_obj['color']} {target_obj['shape']} to the {destination}"
+                text = (
+                    f"{verb} the {target_obj['color']} {target_obj['shape']} to the {destination}"
+                )
             else:
                 text = f"{verb} the {target_obj['color']} {target_obj['shape']}"
         instruction = Instruction(text=text, reference=text, language="en")

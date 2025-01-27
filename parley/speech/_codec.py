@@ -26,7 +26,7 @@ import numpy as np
 # ---- Tunable constants ----------------------------------------------------
 DEFAULT_SR = 16_000
 SYMBOL_DURATION = 0.08  # 80 ms per word symbol — short enough to keep audio < 5s
-GAP_DURATION = 0.02     # 20 ms gap between symbols
+GAP_DURATION = 0.02  # 20 ms gap between symbols
 # Frequency grid: place symbols on a log-spaced grid between 200 Hz and 3400 Hz
 # (telephony passband) so mu-law / lowpass perturbations behave realistically.
 FREQ_MIN = 220.0

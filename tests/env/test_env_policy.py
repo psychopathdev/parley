@@ -76,8 +76,9 @@ def test_scripted_solves_pick() -> None:
         TabletopEnv(max_steps=30),
         GoalSpec(verb="pick", target="red cube"),
         ScriptedPolicy(),
-        Grounding(verb="pick", target="red cube", modifier="red",
-                  slots={"color": "red", "shape": "cube"}),
+        Grounding(
+            verb="pick", target="red cube", modifier="red", slots={"color": "red", "shape": "cube"}
+        ),
     )
     assert info["success"] is True
 
@@ -87,8 +88,12 @@ def test_scripted_solves_place_left() -> None:
         TabletopEnv(max_steps=40),
         GoalSpec(verb="place", target="blue sphere", destination="left"),
         ScriptedPolicy(),
-        Grounding(verb="place", target="blue sphere", destination="left",
-                  slots={"color": "blue", "shape": "sphere", "direction": "left"}),
+        Grounding(
+            verb="place",
+            target="blue sphere",
+            destination="left",
+            slots={"color": "blue", "shape": "sphere", "direction": "left"},
+        ),
     )
     assert info["success"] is True
 
@@ -118,8 +123,9 @@ def test_noisy_policy_wraps_scripted() -> None:
         TabletopEnv(max_steps=40),
         GoalSpec(verb="pick", target="red cube"),
         NoisyPolicy(base=ScriptedPolicy(), sigma=0.02),
-        Grounding(verb="pick", target="red cube", modifier="red",
-                  slots={"color": "red", "shape": "cube"}),
+        Grounding(
+            verb="pick", target="red cube", modifier="red", slots={"color": "red", "shape": "cube"}
+        ),
     )
     assert info["success"] is True
 

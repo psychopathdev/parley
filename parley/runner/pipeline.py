@@ -101,7 +101,9 @@ def run_episode(
     if perturbation is not None:
         audio, instr = perturbation.apply(audio, instr, pert_rng)
 
-    speech_ms, transcript_obj = _stopwatch(lambda: pipeline.speech.transcribe(audio, reference=instr))
+    speech_ms, transcript_obj = _stopwatch(
+        lambda: pipeline.speech.transcribe(audio, reference=instr)
+    )
     transcript = cast(Transcript, transcript_obj)
 
     ground_ms, grounding_obj = _stopwatch(lambda: pipeline.grounder.ground(transcript))
