@@ -1,0 +1,4 @@
+# Each line is a fnmatch path; the listed owners are auto-requested
+# for review. Use sparingly.
+
+*       @mrvellang
