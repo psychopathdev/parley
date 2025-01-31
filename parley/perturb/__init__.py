@@ -24,12 +24,14 @@ from parley.perturb.audio import (
     TimeStretch,
 )
 from parley.perturb.base import AudioPerturbation, Compose, LinguisticPerturbation, Perturbation
+from parley.perturb.channel import BandLimit, PacketLoss, SpectralDecimate
 from parley.perturb.linguistic import AccentSubstitution, Disfluency, FillerInsertion
 
 __all__ = [
     "AccentSubstitution",
     "AdditiveNoise",
     "AudioPerturbation",
+    "BandLimit",
     "Clip",
     "Compose",
     "Disfluency",
@@ -37,8 +39,10 @@ __all__ = [
     "Gain",
     "LinguisticPerturbation",
     "MuLawCodec",
+    "PacketLoss",
     "Perturbation",
     "PitchShift",
     "Reverb",
+    "SpectralDecimate",
     "TimeStretch",
 ]
