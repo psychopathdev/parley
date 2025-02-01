@@ -1,0 +1,24 @@
+# quickstart: 1 pipeline x (clean + mild noise) on 16 synthetic episodes.
+# Run with:  parley run examples/configs/quickstart.yaml
+name: quickstart
+seed: 0
+dataset:
+  source: synth
+  episodes: 16
+env:
+  name: tabletop
+pipelines:
+  - name: codec+scripted
+    speech: { name: codec }
+    grounding: { name: rule_based }
+    policy: { name: scripted }
+perturbations:
+  - name: mild_noise
+    steps:
+      - { name: additive_noise, params: { snr_db: 5.0 } }
+metrics: [wer, grounding_f1, success_rate, latency]
+runner:
+  max_steps: 30
+  workers: 1
+  cache_dir: null
+output_dir: runs/quickstart

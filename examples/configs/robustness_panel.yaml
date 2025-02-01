@@ -1,0 +1,36 @@
+# robustness: compare scripted vs random under a broad perturbation panel.
+# Run with:  parley run examples/configs/robustness_panel.yaml
+name: robustness-panel
+seed: 7
+dataset:
+  source: synth
+  episodes: 32
+env:
+  name: tabletop
+pipelines:
+  - name: codec+scripted
+    speech: { name: codec }
+    policy: { name: scripted }
+  - name: codec+random
+    speech: { name: codec }
+    policy: { name: random }
+perturbations:
+  # Acoustic / channel
+  - { name: snr_p10db, steps: [{ name: additive_noise, params: { snr_db: 10 } }] }
+  - { name: snr_0db,   steps: [{ name: additive_noise, params: { snr_db: 0 } }] }
+  - { name: snr_n10db, steps: [{ name: additive_noise, params: { snr_db: -10 } }] }
+  - { name: mu_law,    steps: [{ name: mu_law }] }
+  - { name: telephone, steps: [{ name: band_limit, params: { low_hz: 300, high_hz: 3400 } }] }
+  - { name: packet_loss_10, steps: [{ name: packet_loss, params: { loss_rate: 0.1 } }] }
+  - { name: reverb_med, steps: [{ name: reverb, params: { decay_ms: 120, wet: 0.4 } }] }
+  - { name: heavy_clip, steps: [{ name: clip, params: { threshold: 0.05 } }] }
+  # Linguistic
+  - { name: filler, steps: [{ name: filler, params: { rate: 0.2 } }] }
+  - { name: disfluency, steps: [{ name: disfluency, params: { rate: 0.3 } }] }
+  - { name: accent_subst, steps: [{ name: accent_subst, params: { rate: 0.5 } }] }
+metrics: [wer, cer, keyword_recall, grounding_f1, success_rate, latency]
+runner:
+  max_steps: 40
+  workers: 1
+  cache_dir: .cache/parley
+output_dir: runs/robustness
