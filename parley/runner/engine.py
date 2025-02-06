@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 from collections.abc import Callable, Sequence
 from concurrent.futures import ThreadPoolExecutor
@@ -106,6 +107,7 @@ class BenchmarkEngine:
             spec.perturbation_name,
             spec.episode.episode_id,
             self.engine_cfg.seed,
+            config_fingerprint=self._fingerprint(spec),
         )
         cached = self._cache.get(key)
         if cached is not None:
@@ -118,7 +120,14 @@ class BenchmarkEngine:
                 trace_path=cached.get("trace_path"),
             )
 
-        pipeline = self._get_or_build_pipeline(spec.pipeline.name, all_episodes)
+        # Pipelines hold per-episode state in their policy (reset/act), so
+        # the cached-by-name instance can only be shared safely when running
+        # single-threaded. Under a worker pool we build a private pipeline
+        # per call to avoid a data race on policy state.
+        if self.engine_cfg.workers > 1:
+            pipeline = self._build_pipeline(spec.pipeline.name, all_episodes)
+        else:
+            pipeline = self._get_or_build_pipeline(spec.pipeline.name, all_episodes)
         env = env_factory()
         rng_mgr = RngManager(seed=self.engine_cfg.seed)
         trace = run_episode(
@@ -157,6 +166,12 @@ class BenchmarkEngine:
         cached = self._pipelines.get(name)
         if cached is not None:
             return cached
+        pipeline = self._build_pipeline(name, episodes)
+        self._pipelines[name] = pipeline
+        return pipeline
+
+    def _build_pipeline(self, name: str, episodes: Sequence[Episode]) -> Pipeline:
+        """Materialize a fresh, unshared :class:`Pipeline` for ``name``."""
         spec = next((p for p in self.cfg.pipelines if p.name == name), None)
         if spec is None:
             raise ConfigError(f"unknown pipeline name in suite: {name!r}")
@@ -166,15 +181,32 @@ class BenchmarkEngine:
         if spec.speech.name == "codec":
             sample_rate = int(episodes[0].sample_rate) if episodes else 16_000
             extra["speech"] = {"vocab": vocab_for(SynthConfig(sample_rate=sample_rate))}
-        pipeline = build_pipeline(
+        return build_pipeline(
             name=name,
             speech=dict(spec.speech.model_dump()),
             grounding=dict(spec.grounding.model_dump()),
             policy=dict(spec.policy.model_dump()),
             extra_kwargs=extra,
         )
-        self._pipelines[name] = pipeline
-        return pipeline
+
+    def _fingerprint(self, spec: RunSpec) -> str:
+        """Stable hash of the resolved pipeline + perturbation params.
+
+        Without this, two suites that share (pipeline_name, perturbation_name,
+        episode_id, seed) but differ in params — e.g. additive_noise snr_db
+        0 vs -20 under the same group name — would collide in the cache.
+        """
+        pipeline_spec = next((p for p in self.cfg.pipelines if p.name == spec.pipeline.name), None)
+        group = next((g for g in self.cfg.perturbations if g.name == spec.perturbation_name), None)
+        payload = {
+            "pipeline": pipeline_spec.model_dump() if pipeline_spec is not None else None,
+            "perturbation": group.model_dump() if group is not None else None,
+            "env": self.cfg.env.model_dump(),
+            "metrics": list(self.cfg.metrics),
+            "max_steps": self.engine_cfg.max_steps,
+        }
+        blob = json.dumps(payload, sort_keys=True, default=str)
+        return hashlib.blake2b(blob.encode("utf-8"), digest_size=8).hexdigest()
 
     def _build_metrics(self, names: Sequence[str]) -> list[Metric]:
         metrics: list[Metric] = []

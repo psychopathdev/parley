@@ -20,6 +20,7 @@ from parley.core.types import (
     Audio,
     Frame,
     Grounding,
+    Instruction,
     Observation,
     StepRecord,
     Trace,
@@ -99,7 +100,16 @@ def run_episode(
     audio = Audio(samples=episode.audio, sample_rate=episode.sample_rate)
     instr = episode.instruction
     if perturbation is not None:
+        original_text = instr.text
         audio, instr = perturbation.apply(audio, instr, pert_rng)
+        # If a linguistic perturbation changed the instruction text AND the
+        # speech frontend is the codec (whose audio is the deterministic
+        # encoding of the text), re-encode the perturbed text so the
+        # transcription path actually sees the change. Real-audio adapters
+        # (Whisper) leave instr.text alone in their perturbation path, so
+        # the no-op happens automatically there.
+        if instr.text != original_text:
+            audio = _maybe_reencode_codec(audio, instr, pipeline) or audio
 
     speech_ms, transcript_obj = _stopwatch(
         lambda: pipeline.speech.transcribe(audio, reference=instr)
@@ -155,6 +165,38 @@ def _stopwatch(thunk: Callable[[], object]) -> tuple[float, object]:
     return (time.perf_counter() - start) * 1_000.0, result
 
 
-def cache_key(pipeline_name: str, perturbation_name: str, episode_id: str, seed: int) -> str:
-    """Stable cache key for a (pipeline, perturbation, episode, seed) tuple."""
-    return f"{pipeline_name}::{perturbation_name}::{episode_id}::seed={seed}"
+def cache_key(
+    pipeline_name: str,
+    perturbation_name: str,
+    episode_id: str,
+    seed: int,
+    *,
+    config_fingerprint: str = "",
+) -> str:
+    """Stable cache key for a (pipeline, perturbation, episode, seed) tuple.
+
+    ``config_fingerprint`` folds in the *resolved* pipeline + perturbation
+    params so two suites that reuse the same names but differ in params
+    (e.g. additive_noise snr_db 0 vs -20) don't collide.
+    """
+    suffix = f"::cfg={config_fingerprint}" if config_fingerprint else ""
+    return f"{pipeline_name}::{perturbation_name}::{episode_id}::seed={seed}{suffix}"
+
+
+def _maybe_reencode_codec(audio: Audio, instr: Instruction, pipeline: Pipeline) -> Audio | None:
+    """Re-encode the codec frontend's audio when the instruction text changed.
+
+    Returns the new :class:`Audio` if the frontend is a codec; ``None``
+    otherwise (caller keeps the existing audio). Looking at the frontend
+    by class avoids a circular import in the speech package: codec audio
+    is only meaningful when both encoder and decoder share the same
+    vocab, which only :class:`CodecSpeechFrontend` exposes.
+    """
+    from parley.speech._codec import encode
+    from parley.speech.codec import CodecSpeechFrontend
+
+    fe = pipeline.speech
+    if not isinstance(fe, CodecSpeechFrontend):
+        return None
+    new_samples = encode(instr.text, fe._cfg)
+    return Audio(samples=new_samples, sample_rate=audio.sample_rate)
