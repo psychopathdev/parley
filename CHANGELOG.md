@@ -6,6 +6,19 @@ adheres to [SemVer](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
 
+### Fixed
+- Linguistic perturbations (disfluency / filler / accent) are no longer
+  silent: when the codec frontend is in use, the runner re-encodes the
+  perturbed instruction text so the change actually reaches the ASR
+  stage and moves WER.
+- The result cache key now folds in a fingerprint of the resolved
+  pipeline + perturbation params, so two suites that share group *names*
+  but differ in params (e.g. `additive_noise` snr_db 0 vs -20) no longer
+  collide.
+- The engine builds a private pipeline per call under `workers > 1`,
+  removing a data race on the stateful policy when running multi-threaded.
+- `_resample_linear` no longer raises on empty input.
+
 ## [0.1.0] — 2026-06-09
 
 Initial public release.
