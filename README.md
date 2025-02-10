@@ -1,8 +1,8 @@
 # Parley
 
-[![ci](https://github.com/mrvellang/parley/actions/workflows/ci.yml/badge.svg)](https://github.com/mrvellang/parley/actions/workflows/ci.yml)
-[![codeql](https://github.com/mrvellang/parley/actions/workflows/codeql.yml/badge.svg)](https://github.com/mrvellang/parley/actions/workflows/codeql.yml)
-[![python](https://img.shields.io/badge/python-3.10%E2%80%933.13-blue)](https://github.com/mrvellang/parley)
+[![ci](https://github.com/psychopathdev/parley/actions/workflows/ci.yml/badge.svg)](https://github.com/psychopathdev/parley/actions/workflows/ci.yml)
+[![codeql](https://github.com/psychopathdev/parley/actions/workflows/codeql.yml/badge.svg)](https://github.com/psychopathdev/parley/actions/workflows/codeql.yml)
+[![python](https://img.shields.io/badge/python-3.10%E2%80%933.13-blue)](https://github.com/psychopathdev/parley)
 [![license](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![ruff](https://img.shields.io/badge/ruff-checked-261230)](https://docs.astral.sh/ruff/)
 [![mypy](https://img.shields.io/badge/mypy-strict-blue)](http://mypy-lang.org/)

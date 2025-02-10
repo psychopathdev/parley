@@ -6,7 +6,7 @@ you can spend the rest of it on the actual change.
 ## Quick start
 
 ```bash
-git clone https://github.com/mrvellang/parley.git
+git clone https://github.com/psychopathdev/parley.git
 cd parley
 python -m venv .venv && source .venv/bin/activate
 pip install -e ".[dev]"
