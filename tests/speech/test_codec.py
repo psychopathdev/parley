@@ -10,10 +10,22 @@ from parley.speech import CodecSpeechFrontend, MockSpeechFrontend
 from parley.speech._codec import CodecConfig, decode, encode
 
 VOCAB = (
-    "pick", "place", "push", "the", "a",
-    "red", "blue", "green", "yellow",
-    "cube", "sphere", "block", "ball",
-    "left", "right", "to",
+    "pick",
+    "place",
+    "push",
+    "the",
+    "a",
+    "red",
+    "blue",
+    "green",
+    "yellow",
+    "cube",
+    "sphere",
+    "block",
+    "ball",
+    "left",
+    "right",
+    "to",
 )
 
 

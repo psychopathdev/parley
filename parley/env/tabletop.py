@@ -26,8 +26,8 @@ from parley.core.types import Action, Frame, GoalSpec, SceneSpec
 # State vector layout, all in workspace coordinates:
 #  [eef_x, eef_y, holding_idx, holding_color_id, holding_shape_id, n_objects]
 STATE_DIM = 6
-PROXIMITY = 0.08         # how close eef must be to grab an object
-PLACE_TOLERANCE = 0.15   # how close a destination zone must be to call placement done
+PROXIMITY = 0.08  # how close eef must be to grab an object
+PLACE_TOLERANCE = 0.15  # how close a destination zone must be to call placement done
 
 # Direction zones for "to the left/right/center"
 DIRECTION_ZONES: dict[str, tuple[float, float]] = {

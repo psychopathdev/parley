@@ -70,8 +70,12 @@ def _cfg(perturbations: list[PerturbationGroup] | None = None) -> BenchmarkConfi
         seed=0,
         env=EnvConfig(name="tabletop"),
         pipelines=[
-            PipelineConfig(name="P1", speech=PluginSpec(name="codec"), policy=PluginSpec(name="scripted")),
-            PipelineConfig(name="P2", speech=PluginSpec(name="codec"), policy=PluginSpec(name="random")),
+            PipelineConfig(
+                name="P1", speech=PluginSpec(name="codec"), policy=PluginSpec(name="scripted")
+            ),
+            PipelineConfig(
+                name="P2", speech=PluginSpec(name="codec"), policy=PluginSpec(name="random")
+            ),
         ],
         perturbations=perturbations or [],
         metrics=["success_rate"],
@@ -82,9 +86,13 @@ def _cfg(perturbations: list[PerturbationGroup] | None = None) -> BenchmarkConfi
 
 def test_expand_suite_cartesian_product() -> None:
     eps = generate_dataset(SynthConfig(n_episodes=3, seed=0))
-    cfg = _cfg(perturbations=[
-        PerturbationGroup(name="noise", steps=[PluginSpec(name="additive_noise", params={"snr_db": 0.0})]),
-    ])
+    cfg = _cfg(
+        perturbations=[
+            PerturbationGroup(
+                name="noise", steps=[PluginSpec(name="additive_noise", params={"snr_db": 0.0})]
+            ),
+        ]
+    )
     runs = expand_suite(cfg, eps)
     # 2 pipelines * (clean + noise) * 3 episodes = 12
     assert len(runs) == 12
@@ -118,9 +126,11 @@ def test_build_pipeline_missing_name_errors() -> None:
 
 def test_engine_runs_full_suite_and_writes_traces(tmp_path: Path) -> None:
     eps = generate_dataset(SynthConfig(n_episodes=2, seed=0))
-    cfg = _cfg(perturbations=[
-        PerturbationGroup(name="mu_law", steps=[PluginSpec(name="mu_law")]),
-    ])
+    cfg = _cfg(
+        perturbations=[
+            PerturbationGroup(name="mu_law", steps=[PluginSpec(name="mu_law")]),
+        ]
+    )
     cfg = cfg.model_copy(update={"output_dir": str(tmp_path / "runs")})
     engine = BenchmarkEngine(cfg)
     results = engine.run(eps)
@@ -142,10 +152,12 @@ def test_engine_runs_full_suite_and_writes_traces(tmp_path: Path) -> None:
 
 def test_engine_uses_cache_on_second_run(tmp_path: Path) -> None:
     eps = generate_dataset(SynthConfig(n_episodes=2, seed=0))
-    cfg = _cfg().model_copy(update={
-        "output_dir": str(tmp_path / "runs"),
-        "runner": RunnerConfig(max_steps=20, workers=1, cache_dir=str(tmp_path / "cache")),
-    })
+    cfg = _cfg().model_copy(
+        update={
+            "output_dir": str(tmp_path / "runs"),
+            "runner": RunnerConfig(max_steps=20, workers=1, cache_dir=str(tmp_path / "cache")),
+        }
+    )
     BenchmarkEngine(cfg).run(eps)
     second = BenchmarkEngine(cfg).run(eps)
     # All results must arrive populated (cached values still carry success+metrics).
@@ -154,10 +166,12 @@ def test_engine_uses_cache_on_second_run(tmp_path: Path) -> None:
 
 def test_engine_threadpool_runs(tmp_path: Path) -> None:
     eps = generate_dataset(SynthConfig(n_episodes=4, seed=0))
-    cfg = _cfg().model_copy(update={
-        "output_dir": str(tmp_path / "runs"),
-        "runner": RunnerConfig(max_steps=20, workers=2, cache_dir=None),
-    })
+    cfg = _cfg().model_copy(
+        update={
+            "output_dir": str(tmp_path / "runs"),
+            "runner": RunnerConfig(max_steps=20, workers=2, cache_dir=None),
+        }
+    )
     results = BenchmarkEngine(cfg).run(eps)
     # 2 pipelines * 1 (clean) * 4 = 8
     assert len(results) == 8
@@ -183,8 +197,10 @@ def test_engine_runs_against_loaded_dataset(tmp_path: Path) -> None:
     save_episodes(eps, tmp_path / "ds.jsonl")
     loaded = load_episodes(tmp_path / "ds.jsonl")
     cfg = _cfg().model_copy(update={"output_dir": str(tmp_path / "runs")})
-    cfg = cfg.model_copy(update={
-        "dataset": DatasetConfig(source="file", path=str(tmp_path / "ds.jsonl"), episodes=2),
-    })
+    cfg = cfg.model_copy(
+        update={
+            "dataset": DatasetConfig(source="file", path=str(tmp_path / "ds.jsonl"), episodes=2),
+        }
+    )
     results = BenchmarkEngine(cfg).run(loaded)
     assert len(results) == 4

@@ -44,9 +44,7 @@ class Registry(Generic[T]):
     ) -> Callable[[T], T]:
         def decorator(obj: T) -> T:
             if not replace and name in self._items:
-                raise RegistryError(
-                    f"duplicate {self.kind} registration: {name!r} already exists"
-                )
+                raise RegistryError(f"duplicate {self.kind} registration: {name!r} already exists")
             self._items[name] = obj
             return obj
 
@@ -55,9 +53,7 @@ class Registry(Generic[T]):
     def register_value(self, name: str, value: T, *, replace: bool = False) -> T:
         """Non-decorator form for programmatic registration."""
         if not replace and name in self._items:
-            raise RegistryError(
-                f"duplicate {self.kind} registration: {name!r} already exists"
-            )
+            raise RegistryError(f"duplicate {self.kind} registration: {name!r} already exists")
         self._items[name] = value
         return value
 
@@ -66,9 +62,7 @@ class Registry(Generic[T]):
             return self._items[name]
         except KeyError as exc:
             available = ", ".join(sorted(self._items)) or "<none>"
-            raise RegistryError(
-                f"unknown {self.kind} {name!r} (available: {available})"
-            ) from exc
+            raise RegistryError(f"unknown {self.kind} {name!r} (available: {available})") from exc
 
     def names(self) -> list[str]:
         return sorted(self._items)

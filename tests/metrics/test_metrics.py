@@ -52,8 +52,9 @@ def _trace(
         goal=GoalSpec(verb="pick", target="red cube"),
         scene=SceneSpec(objects=()),
         steps=[
-            StepRecord(step=0, action=Action(vec=np.zeros(2, dtype=np.float32)),
-                       reward=0.0, done=False)
+            StepRecord(
+                step=0, action=Action(vec=np.zeros(2, dtype=np.float32)), reward=0.0, done=False
+            )
         ],
         success=success,
         timings_ms=timings or {},

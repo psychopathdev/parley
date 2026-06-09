@@ -42,9 +42,7 @@ class WhisperSpeechFrontend:
     def transcribe(self, audio: Audio, *, reference: Instruction | None = None) -> Transcript:
         # Whisper expects mono float32 PCM at 16 kHz.
         if audio.sample_rate != 16_000:
-            raise ValueError(
-                f"WhisperSpeechFrontend expects 16kHz audio, got {audio.sample_rate}"
-            )
+            raise ValueError(f"WhisperSpeechFrontend expects 16kHz audio, got {audio.sample_rate}")
         result = self._model.transcribe(audio.samples)
         text = str(result.get("text", "")).strip()
         return Transcript(

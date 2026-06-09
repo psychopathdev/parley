@@ -45,6 +45,9 @@ def expand_suite(cfg: BenchmarkConfig, episodes: Iterable[Episode]) -> list[RunS
     for pipeline in cfg.pipelines:
         for pname, pert in pert_objs:
             for ep in eps:
-                runs.append(RunSpec(pipeline=pipeline, perturbation_name=pname,
-                                    perturbation=pert, episode=ep))
+                runs.append(
+                    RunSpec(
+                        pipeline=pipeline, perturbation_name=pname, perturbation=pert, episode=ep
+                    )
+                )
     return runs

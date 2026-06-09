@@ -77,9 +77,7 @@ class BenchmarkConfig(_Strict):
     env: EnvConfig = EnvConfig()
     pipelines: list[PipelineConfig]
     perturbations: list[PerturbationGroup] = Field(default_factory=list)
-    metrics: list[str] = Field(
-        default_factory=lambda: ["wer", "grounding_f1", "success_rate"]
-    )
+    metrics: list[str] = Field(default_factory=lambda: ["wer", "grounding_f1", "success_rate"])
     runner: RunnerConfig = RunnerConfig()
     output_dir: str = "runs"
 

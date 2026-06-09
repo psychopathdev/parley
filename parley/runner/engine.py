@@ -207,7 +207,9 @@ class BenchmarkEngine:
         the dataset + perturbation seed, and including it would balloon
         run directories.
         """
-        path = traces_dir / f"{spec.pipeline.name}--{spec.perturbation_name}--{trace.episode_id}.json"
+        path = (
+            traces_dir / f"{spec.pipeline.name}--{spec.perturbation_name}--{trace.episode_id}.json"
+        )
         body = {
             "episode_id": trace.episode_id,
             "pipeline": spec.pipeline.name,

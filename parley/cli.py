@@ -33,7 +33,9 @@ console = Console()
 
 @app.callback()
 def _global_options(
-    version: Annotated[bool, typer.Option("--version", help="Show parley version and exit.")] = False,
+    version: Annotated[
+        bool, typer.Option("--version", help="Show parley version and exit.")
+    ] = False,
 ) -> None:
     if version:
         typer.echo(__version__)
@@ -42,7 +44,9 @@ def _global_options(
 
 @app.command("synth")
 def synth_cmd(
-    out: Annotated[Path, typer.Option(..., help="Output jsonl path (an .audio.npz sibling is also written).")],
+    out: Annotated[
+        Path, typer.Option(..., help="Output jsonl path (an .audio.npz sibling is also written).")
+    ],
     episodes: Annotated[int, typer.Option(help="Number of episodes to generate.")] = 32,
     seed: Annotated[int, typer.Option(help="RNG seed (reproducible).")] = 0,
     sample_rate: Annotated[int, typer.Option(help="Sample rate of generated audio (Hz).")] = 16_000,
@@ -57,7 +61,10 @@ def synth_cmd(
 @app.command("run")
 def run_cmd(
     config: Annotated[Path, typer.Argument(help="Path to a benchmark YAML config.")],
-    dataset: Annotated[Path | None, typer.Option(help="Override the dataset path; otherwise the config's dataset is used.")] = None,
+    dataset: Annotated[
+        Path | None,
+        typer.Option(help="Override the dataset path; otherwise the config's dataset is used."),
+    ] = None,
     seed: Annotated[int | None, typer.Option(help="Override the config seed.")] = None,
 ) -> None:
     """Run a benchmark suite and write per-run traces + a JSON report."""
@@ -81,16 +88,20 @@ def run_cmd(
     # Persist the resolved config alongside the report.
     (Path(cfg.output_dir) / "config.resolved.yaml").write_text(dump_config(cfg), encoding="utf-8")
 
-    console.print(f"\n[bold green]{cfg.name}[/bold green] - {len(results)} episodes across "
-                  f"{len({r.pipeline for r in results})} pipelines x "
-                  f"{len({r.perturbation for r in results})} perturbation groups\n")
+    console.print(
+        f"\n[bold green]{cfg.name}[/bold green] - {len(results)} episodes across "
+        f"{len({r.pipeline for r in results})} pipelines x "
+        f"{len({r.perturbation for r in results})} perturbation groups\n"
+    )
     console.print(render_markdown(rows))
     console.print(f"\nReport written to [cyan]{report_path}[/cyan]")
 
 
 @app.command("report")
 def report_cmd(
-    runs_dir: Annotated[Path, typer.Argument(help="Run output directory (containing report.json).")],
+    runs_dir: Annotated[
+        Path, typer.Argument(help="Run output directory (containing report.json).")
+    ],
     fmt: Annotated[str, typer.Option("--format", "-f", help="markdown | csv | json")] = "markdown",
 ) -> None:
     """Re-render a previously-written report."""
@@ -118,13 +129,15 @@ def report_cmd(
                 )
                 for name, s in r.get("metrics", {}).items()
             }
-            rows.append(ReportRow(
-                pipeline=r["pipeline"],
-                perturbation=r["perturbation"],
-                n_episodes=int(r["n_episodes"]),
-                success_rate=float(r["success_rate"]),
-                metrics=metrics,
-            ))
+            rows.append(
+                ReportRow(
+                    pipeline=r["pipeline"],
+                    perturbation=r["perturbation"],
+                    n_episodes=int(r["n_episodes"]),
+                    success_rate=float(r["success_rate"]),
+                    metrics=metrics,
+                )
+            )
         typer.echo(render_csv(rows))
         return
     # markdown (default)
@@ -132,8 +145,9 @@ def report_cmd(
     for col in ("pipeline", "perturbation", "n", "success"):
         table.add_column(col)
     for r in body["rows"]:
-        table.add_row(r["pipeline"], r["perturbation"], str(r["n_episodes"]),
-                      f"{r['success_rate']:.2%}")
+        table.add_row(
+            r["pipeline"], r["perturbation"], str(r["n_episodes"]), f"{r['success_rate']:.2%}"
+        )
     console.print(table)
     if body.get("leaderboard"):
         console.print("\n[bold]Leaderboard[/bold]")
@@ -147,7 +161,9 @@ def report_cmd(
 
 @app.command("list")
 def list_cmd(
-    kind: Annotated[str | None, typer.Option(help="Filter to one kind (speech, perturbation, ...).")] = None,
+    kind: Annotated[
+        str | None, typer.Option(help="Filter to one kind (speech, perturbation, ...).")
+    ] = None,
 ) -> None:
     """Print all registered plugins by kind."""
     registries = {
@@ -170,15 +186,15 @@ def list_cmd(
 
 
 @app.command("validate")
-def validate_cmd(
-    config: Annotated[Path, typer.Argument(help="YAML config to validate.")]
-) -> None:
+def validate_cmd(config: Annotated[Path, typer.Argument(help="YAML config to validate.")]) -> None:
     """Parse a benchmark config and report errors."""
     cfg = load_config(config)
     n_pipelines = len(cfg.pipelines)
     n_perturbs = len(cfg.perturbations) + 1  # plus clean
-    console.print(f"[green]ok[/green] {cfg.name}: {n_pipelines} pipelines, "
-                  f"{n_perturbs} perturbation groups, {cfg.dataset.episodes} episodes")
+    console.print(
+        f"[green]ok[/green] {cfg.name}: {n_pipelines} pipelines, "
+        f"{n_perturbs} perturbation groups, {cfg.dataset.episodes} episodes"
+    )
 
 
 def main() -> None:  # pragma: no cover - thin wrapper
