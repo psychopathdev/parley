@@ -80,14 +80,17 @@ def generate_dataset(cfg: SynthConfig) -> list[Episode]:
             text = f"pick the {target_obj['color']} {target_obj['shape']}"
             destination: str | None = None
         else:
-            include_dir = cfg.include_directions and rng.random() < 0.9
-            destination = DIRECTIONS[int(rng.integers(0, len(DIRECTIONS)))] if include_dir else None
-            if destination:
+            # place/push always carry a destination so the success predicate
+            # is satisfiable. include_directions=False degrades them to picks.
+            if not cfg.include_directions:
+                verb = "pick"
+                text = f"pick the {target_obj['color']} {target_obj['shape']}"
+                destination = None
+            else:
+                destination = DIRECTIONS[int(rng.integers(0, len(DIRECTIONS)))]
                 text = (
                     f"{verb} the {target_obj['color']} {target_obj['shape']} to the {destination}"
                 )
-            else:
-                text = f"{verb} the {target_obj['color']} {target_obj['shape']}"
         instruction = Instruction(text=text, reference=text, language="en")
         audio = encode(text, codec)
         scene = SceneSpec(objects=tuple(scene_objects))
