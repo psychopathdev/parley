@@ -1,0 +1,25 @@
+# snr-sweep: a single pipeline against a five-rung SNR ladder.
+# Used as the canonical "degradation curve" demonstration.
+# Run with:  parley run examples/configs/snr_sweep.yaml
+name: snr-sweep
+seed: 0
+dataset:
+  source: synth
+  episodes: 24
+env:
+  name: tabletop
+pipelines:
+  - name: codec+scripted
+    speech: { name: codec }
+    policy: { name: scripted }
+perturbations:
+  - { name: snr_p20db, steps: [{ name: additive_noise, params: { snr_db: 20 } }] }
+  - { name: snr_p10db, steps: [{ name: additive_noise, params: { snr_db: 10 } }] }
+  - { name: snr_0db,   steps: [{ name: additive_noise, params: { snr_db: 0 } }] }
+  - { name: snr_n10db, steps: [{ name: additive_noise, params: { snr_db: -10 } }] }
+  - { name: snr_n20db, steps: [{ name: additive_noise, params: { snr_db: -20 } }] }
+metrics: [wer, grounding_f1, success_rate]
+runner:
+  max_steps: 30
+  workers: 1
+output_dir: runs/snr-sweep
