@@ -171,6 +171,8 @@ def _resample_linear(x: np.ndarray, factor: float) -> np.ndarray:
     if factor == 1.0:
         return x
     n_in = x.shape[0]
+    if n_in == 0:
+        return x  # nothing to resample; avoids negative linspace indices
     n_out = max(round(n_in / factor), 1)
     src = np.linspace(0.0, n_in - 1.0, n_out)
     i = np.floor(src).astype(np.int64)
