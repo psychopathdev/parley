@@ -79,7 +79,7 @@ def _cfg(perturbations: list[PerturbationGroup] | None = None) -> BenchmarkConfi
         ],
         perturbations=perturbations or [],
         metrics=["success_rate"],
-        runner=RunnerConfig(max_steps=20, workers=1, cache_dir=None),
+        runner=RunnerConfig(max_steps=40, workers=1, cache_dir=None),
         output_dir="runs",
     )
 
