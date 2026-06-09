@@ -1,0 +1,28 @@
+name: release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write   # OIDC for trusted publishing
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: install build deps
+        run: pip install build twine
+      - name: build sdist + wheel
+        run: python -m build
+      - name: check artifacts
+        run: twine check dist/*
+      - name: publish
+        uses: pypa/gh-action-pypi-publish@release/v1
