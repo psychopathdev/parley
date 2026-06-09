@@ -47,7 +47,7 @@ jobs:
       - run: pytest -q --cov=parley --cov-report=xml --cov-report=term
       - name: upload-coverage
         if: matrix.os == 'ubuntu-latest' && matrix.python == '3.12'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: coverage-xml
           path: coverage.xml
